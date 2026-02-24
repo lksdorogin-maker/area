@@ -420,15 +420,14 @@ window.useHistoryItem = function(id) {
 
 // Конвертер единиц (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 function setupUnitConverter() {
-    const convertBtn = document.getElementById('convert-btn');
+    // const convertBtn = document.getElementById('convert-btn');
     const converterValue = document.getElementById('converter-value');
     const converterFrom = document.getElementById('converter-from');
     const converterTo = document.getElementById('converter-to');
     const converterResult = document.getElementById('converter-result');
     
-    if (!convertBtn || !converterValue || !converterFrom || !converterTo || !converterResult) {
+    if ( !converterValue || !converterFrom || !converterTo || !converterResult) {
         console.error('Элементы конвертера не найдены');
-        return;
     }
     
     // Функция конвертации
@@ -471,7 +470,7 @@ function setupUnitConverter() {
     }
     
     // Обработчик кнопки
-    convertBtn.addEventListener('click', performConversion);
+    // convertBtn.addEventListener('click', performConversion);
     
     // Автоматическая конвертация при изменении полей
     converterValue.addEventListener('input', performConversion);

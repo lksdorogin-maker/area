@@ -32,6 +32,23 @@ body {
     color: var(--text-color);
     line-height: 1.6;
 }
+.svgcolor{
+    background-color:var(--primary-color) ;
+    border-radius: 15px;
+    display: inline-block;
+    width: 80px;
+    height: 42px;
+    margin-bottom: 16px;
+}
+
+.trz {
+    background-color: var(--primary-color);
+    display: inline-block;
+    width: 80px;
+    height: 42px;
+    margin-bottom: 16px;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+}
 
 /* Навигация */
 .navbar {

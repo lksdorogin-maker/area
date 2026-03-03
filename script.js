@@ -26,12 +26,13 @@ const unitDisplayNames = {
 
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Сайт загружен!');
+    console.log('Калькулятор площадей загружен!');
     initializeShapeCards();
     setupEventListeners();
     loadHistory();
     setupThemeToggle();
     setupUnitConverter();
+    initializeTooltips();
 });
 
 // Настройка карточек фигур
@@ -58,12 +59,13 @@ function showInputFields(shapeType) {
     let html = '';
     
     switch(shapeType) {
+        // Существующие фигуры
         case 'square':
             html = `
                 <div class="input-group">
                     <label><i class="fas fa-ruler"></i> Сторона квадрата (a)</label>
                     <input type="number" id="square-side" class="shape-input" placeholder="Введите длину стороны" step="0.01" min="0">
-                    <small class="input-hint">Введите длину стороны в выбранных единицах</small>
+                    <small class="input-hint">S = a²</small>
                 </div>
             `;
             break;
@@ -78,21 +80,69 @@ function showInputFields(shapeType) {
                     <label><i class="fas fa-ruler-vertical"></i> Ширина (b)</label>
                     <input type="number" id="rect-width" class="shape-input" placeholder="Введите ширину" step="0.01" min="0">
                 </div>
+                <small class="input-hint">S = a × b</small>
             `;
             break;
             
-        case 'triangle':
-            html = `
-                <div class="input-group">
-                    <label><i class="fas fa-ruler"></i> Основание (a)</label>
-                    <input type="number" id="tri-base" class="shape-input" placeholder="Введите основание" step="0.01" min="0">
-                </div>
-                <div class="input-group">
-                    <label><i class="fas fa-mountain"></i> Высота (h)</label>
-                    <input type="number" id="tri-height" class="shape-input" placeholder="Введите высоту" step="0.01" min="0">
-                </div>
-            `;
-            break;
+case 'triangle':
+    html = `
+        <div class="input-group">
+            <label><i class="fas fa-gem"></i> Способ 1: Основание и высота</label>
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-ruler"></i> Основание (a)</label>
+            <input type="number" id="tri-base" class="shape-input" placeholder="Введите основание" step="0.01" min="0">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-mountain"></i> Высота (h)</label>
+            <input type="number" id="tri-height" class="shape-input" placeholder="Введите высоту" step="0.01" min="0">
+        </div>
+        
+        <div class="input-divider">- ИЛИ -</div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-gem"></i> Способ 2: Три стороны (формула Герона)</label>
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-ruler"></i> Сторона a</label>
+            <input type="number" id="tri-side-a" class="shape-input" placeholder="Введите сторону a" step="0.01" min="0">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-ruler"></i> Сторона b</label>
+            <input type="number" id="tri-side-b" class="shape-input" placeholder="Введите сторону b" step="0.01" min="0">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-ruler"></i> Сторона c</label>
+            <input type="number" id="tri-side-c" class="shape-input" placeholder="Введите сторону c" step="0.01" min="0">
+        </div>
+        
+        <div class="input-divider">- ИЛИ -</div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-gem"></i> Способ 3: По радиусу вписанной окружности</label>
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-circle"></i> Радиус вписанной окружности (r)</label>
+            <input type="number" id="tri-inscribed-radius" class="shape-input" placeholder="Введите радиус" step="0.01" min="0">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-ruler"></i> Полупериметр (p)</label>
+            <input type="number" id="tri-semiperimeter" class="shape-input" placeholder="Введите полупериметр" step="0.01" min="0">
+            <small class="input-hint">p = (a + b + c) / 2</small>
+        </div>
+        
+        <div class="input-divider">- ИЛИ -</div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-gem"></i> Способ 4: Равносторонний треугольник</label>
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-ruler"></i> Сторона равностороннего (a)</label>
+            <input type="number" id="tri-equilateral-side" class="shape-input" placeholder="Введите сторону" step="0.01" min="0">
+            <small class="input-hint">S = (a² × √3) / 4</small>
+        </div>
+    `;
+    break;
             
         case 'circle':
             html = `
@@ -100,6 +150,7 @@ function showInputFields(shapeType) {
                     <label><i class="fas fa-circle-notch"></i> Радиус (r)</label>
                     <input type="number" id="circle-radius" class="shape-input" placeholder="Введите радиус" step="0.01" min="0">
                 </div>
+                <small class="input-hint">S = π × r²</small>
             `;
             break;
             
@@ -117,6 +168,7 @@ function showInputFields(shapeType) {
                     <label><i class="fas fa-mountain"></i> Высота (h)</label>
                     <input type="number" id="trap-height" class="shape-input" placeholder="Введите высоту" step="0.01" min="0">
                 </div>
+                <small class="input-hint">S = ½ × (a + b) × h</small>
             `;
             break;
             
@@ -130,6 +182,67 @@ function showInputFields(shapeType) {
                     <label><i class="fas fa-ruler"></i> Малая полуось (b)</label>
                     <input type="number" id="ellipse-minor" class="shape-input" placeholder="Введите малую полуось" step="0.01" min="0">
                 </div>
+                <small class="input-hint">S = π × a × b</small>
+            `;
+            break;
+            
+        // НОВЫЕ ФИГУРЫ
+        case 'rhombus':
+            html = `
+                <div class="input-group">
+                    <label><i class="fas fa-gem"></i> Способ 1: Через диагонали</label>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-ruler"></i> Диагональ d₁</label>
+                    <input type="number" id="rhombus-diag1" class="shape-input" placeholder="Введите первую диагональ" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-ruler"></i> Диагональ d₂</label>
+                    <input type="number" id="rhombus-diag2" class="shape-input" placeholder="Введите вторую диагональ" step="0.01" min="0">
+                </div>
+                <div class="input-divider">- ИЛИ -</div>
+                <div class="input-group">
+                    <label><i class="fas fa-gem"></i> Способ 2: Через сторону и высоту</label>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-ruler"></i> Сторона (a)</label>
+                    <input type="number" id="rhombus-side" class="shape-input" placeholder="Введите сторону" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-mountain"></i> Высота (h)</label>
+                    <input type="number" id="rhombus-height" class="shape-input" placeholder="Введите высоту" step="0.01" min="0">
+                </div>
+                <small class="input-hint">S = (d₁ × d₂) ÷ 2  или  S = a × h</small>
+            `;
+            break;
+            
+        case 'parallelogram':
+            html = `
+                <div class="input-group">
+                    <label><i class="fas fa-ruler"></i> Основание (a)</label>
+                    <input type="number" id="parallelogram-base" class="shape-input" placeholder="Введите основание" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-mountain"></i> Высота (h)</label>
+                    <input type="number" id="parallelogram-height" class="shape-input" placeholder="Введите высоту" step="0.01" min="0">
+                </div>
+                <div class="input-divider">- ИЛИ -</div>
+                <div class="input-group">
+                    <label><i class="fas fa-gem"></i> Через стороны и угол</label>
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-ruler"></i> Сторона a</label>
+                    <input type="number" id="parallelogram-side-a" class="shape-input" placeholder="Введите сторону a" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-ruler"></i> Сторона b</label>
+                    <input type="number" id="parallelogram-side-b" class="shape-input" placeholder="Введите сторону b" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-angle-double-right"></i> Угол α (градусы)</label>
+                    <input type="number" id="parallelogram-angle" class="shape-input" placeholder="Введите угол в градусах" step="0.1" min="0" max="180">
+                </div>
+                <small class="input-hint">S = a × h  или  S = a × b × sin(α)</small>
             `;
             break;
             
@@ -160,6 +273,7 @@ function calculateArea() {
     
     try {
         switch(currentShape) {
+            // Существующие фигуры
             case 'square':
                 const side = parseFloat(document.getElementById('square-side')?.value);
                 if (!side || side <= 0) throw new Error('Введите положительное значение стороны');
@@ -181,15 +295,97 @@ function calculateArea() {
                 break;
                 
             case 'triangle':
-                const base = parseFloat(document.getElementById('tri-base')?.value);
-                const height = parseFloat(document.getElementById('tri-height')?.value);
-                if (!base || !height || base <= 0 || height <= 0) 
-                    throw new Error('Введите положительные значения основания и высоты');
-                areaInSelectedUnit = 0.5 * base * height;
-                formula = 'S = ½ × a × h';
-                steps = `S = ½ × ${base} × ${height} = ${areaInSelectedUnit.toFixed(4)}`;
-                parameters = { base, height };
-                break;
+    // Проверяем различные способы расчета
+    
+    // Способ 1: Основание и высота
+    const base = parseFloat(document.getElementById('tri-base')?.value);
+    const height = parseFloat(document.getElementById('tri-height')?.value);
+    
+    // Способ 2: Три стороны (формула Герона)
+    const sideA = parseFloat(document.getElementById('tri-side-a')?.value);
+    const sideB = parseFloat(document.getElementById('tri-side-b')?.value);
+    const sideC = parseFloat(document.getElementById('tri-side-c')?.value);
+    
+    // Способ 3: По радиусу вписанной окружности
+    const inscribedRadius = parseFloat(document.getElementById('tri-inscribed-radius')?.value);
+    const semiperimeter = parseFloat(document.getElementById('tri-semiperimeter')?.value);
+    
+    // Способ 4: Равносторонний треугольник
+    const equilateralSide = parseFloat(document.getElementById('tri-equilateral-side')?.value);
+    
+    // Способ 5: По радиусу описанной окружности (равносторонний)
+    const circumRadius = parseFloat(document.getElementById('tri-circum-radius')?.value);
+    
+    // Способ 6: По радиусу вписанной окружности (равносторонний)
+    const equilateralInscribed = parseFloat(document.getElementById('tri-equilateral-inscribed')?.value);
+    
+    // Способ 7: Две стороны и угол
+    const sideAngleA = parseFloat(document.getElementById('tri-side-angle-a')?.value);
+    const sideAngleB = parseFloat(document.getElementById('tri-side-angle-b')?.value);
+    const angle = parseFloat(document.getElementById('tri-angle')?.value);
+    
+    // Определяем какой способ использован
+    if (base && height && base > 0 && height > 0) {
+        // Способ 1: Основание и высота
+        areaInSelectedUnit = 0.5 * base * height;
+        formula = 'S = ½ × a × h';
+        steps = `S = ½ × ${base} × ${height} = ${areaInSelectedUnit.toFixed(4)}`;
+        parameters = { base, height };
+    }
+    else if (sideA && sideB && sideC && sideA > 0 && sideB > 0 && sideC > 0) {
+        // Способ 2: Формула Герона
+        // Проверяем неравенство треугольника
+        if (sideA + sideB <= sideC || sideA + sideC <= sideB || sideB + sideC <= sideA) {
+            throw new Error('Треугольник с такими сторонами не существует (нарушено неравенство треугольника)');
+        }
+        
+        const p = (sideA + sideB + sideC) / 2; // полупериметр
+        areaInSelectedUnit = Math.sqrt(p * (p - sideA) * (p - sideB) * (p - sideC));
+        formula = 'S = √(p(p-a)(p-b)(p-c)) (формула Герона)';
+        steps = `p = (${sideA} + ${sideB} + ${sideC})/2 = ${p.toFixed(4)}\n`;
+        steps += `S = √(${p.toFixed(4)} × ${(p - sideA).toFixed(4)} × ${(p - sideB).toFixed(4)} × ${(p - sideC).toFixed(4)}) = ${areaInSelectedUnit.toFixed(4)}`;
+        parameters = { sideA, sideB, sideC };
+    }
+    else if (inscribedRadius && semiperimeter && inscribedRadius > 0 && semiperimeter > 0) {
+        // Способ 3: По радиусу вписанной окружности
+        areaInSelectedUnit = inscribedRadius * semiperimeter;
+        formula = 'S = r × p';
+        steps = `S = ${inscribedRadius} × ${semiperimeter} = ${areaInSelectedUnit.toFixed(4)}`;
+        parameters = { radius: inscribedRadius, semiperimeter };
+    }
+    else if (equilateralSide && equilateralSide > 0) {
+        // Способ 4: Равносторонний треугольник
+        areaInSelectedUnit = (Math.pow(equilateralSide, 2) * Math.sqrt(3)) / 4;
+        formula = 'S = (a² × √3) / 4';
+        steps = `S = (${equilateralSide}² × √3) / 4 = ${areaInSelectedUnit.toFixed(4)} (√3 ≈ 1.732)`;
+        parameters = { side: equilateralSide };
+    }
+    else if (circumRadius && circumRadius > 0) {
+        // Способ 5: По радиусу описанной окружности (равносторонний)
+        areaInSelectedUnit = (3 * Math.sqrt(3) * Math.pow(circumRadius, 2)) / 4;
+        formula = 'S = (3√3 × R²) / 4';
+        steps = `S = (3 × √3 × ${circumRadius}²) / 4 = ${areaInSelectedUnit.toFixed(4)} (√3 ≈ 1.732)`;
+        parameters = { circumRadius };
+    }
+    else if (equilateralInscribed && equilateralInscribed > 0) {
+        // Способ 6: По радиусу вписанной окружности (равносторонний)
+        areaInSelectedUnit = 3 * Math.sqrt(3) * Math.pow(equilateralInscribed, 2);
+        formula = 'S = 3√3 × r²';
+        steps = `S = 3 × √3 × ${equilateralInscribed}² = ${areaInSelectedUnit.toFixed(4)} (√3 ≈ 1.732)`;
+        parameters = { inscribedRadius: equilateralInscribed };
+    }
+    else if (sideAngleA && sideAngleB && angle && sideAngleA > 0 && sideAngleB > 0 && angle > 0 && angle < 180) {
+        // Способ 7: Две стороны и угол между ними
+        const angleInRadians = angle * Math.PI / 180;
+        areaInSelectedUnit = 0.5 * sideAngleA * sideAngleB * Math.sin(angleInRadians);
+        formula = 'S = ½ × a × b × sin(γ)';
+        steps = `S = ½ × ${sideAngleA} × ${sideAngleB} × sin(${angle}°) = ${areaInSelectedUnit.toFixed(4)}`;
+        parameters = { sideA: sideAngleA, sideB: sideAngleB, angle };
+    }
+    else {
+        throw new Error('Заполните поля для одного из способов расчета треугольника');
+    }
+    break;
                 
             case 'circle':
                 const radius = parseFloat(document.getElementById('circle-radius')?.value);
@@ -224,6 +420,62 @@ function calculateArea() {
                 steps = `S = π × ${majorAxis} × ${minorAxis} = ${areaInSelectedUnit.toFixed(4)} (π ≈ 3.14159)`;
                 parameters = { majorAxis, minorAxis };
                 break;
+                
+            // НОВЫЕ ФИГУРЫ
+            case 'rhombus':
+                const diag1 = parseFloat(document.getElementById('rhombus-diag1')?.value);
+                const diag2 = parseFloat(document.getElementById('rhombus-diag2')?.value);
+                const rhombusSide = parseFloat(document.getElementById('rhombus-side')?.value);
+                const rhombusHeight = parseFloat(document.getElementById('rhombus-height')?.value);
+                
+                // Проверяем какой способ использован
+                if (diag1 && diag2 && diag1 > 0 && diag2 > 0) {
+                    // Расчет через диагонали
+                    areaInSelectedUnit = (diag1 * diag2) / 2;
+                    formula = 'S = (d₁ × d₂) ÷ 2';
+                    steps = `S = (${diag1} × ${diag2}) ÷ 2 = ${areaInSelectedUnit.toFixed(4)}`;
+                    parameters = { diag1, diag2 };
+                } 
+                else if (rhombusSide && rhombusHeight && rhombusSide > 0 && rhombusHeight > 0) {
+                    // Расчет через сторону и высоту
+                    areaInSelectedUnit = rhombusSide * rhombusHeight;
+                    formula = 'S = a × h';
+                    steps = `S = ${rhombusSide} × ${rhombusHeight} = ${areaInSelectedUnit.toFixed(4)}`;
+                    parameters = { side: rhombusSide, height: rhombusHeight };
+                }
+                else {
+                    throw new Error('Заполните поля для одного из способов расчета');
+                }
+                break;
+                
+            case 'parallelogram':
+                const parBase = parseFloat(document.getElementById('parallelogram-base')?.value);
+                const parHeight = parseFloat(document.getElementById('parallelogram-height')?.value);
+                const parSideA = parseFloat(document.getElementById('parallelogram-side-a')?.value);
+                const parSideB = parseFloat(document.getElementById('parallelogram-side-b')?.value);
+                const parAngle = parseFloat(document.getElementById('parallelogram-angle')?.value);
+                
+                // Проверяем какой способ использован
+                if (parBase && parHeight && parBase > 0 && parHeight > 0) {
+                    // Расчет через основание и высоту
+                    areaInSelectedUnit = parBase * parHeight;
+                    formula = 'S = a × h';
+                    steps = `S = ${parBase} × ${parHeight} = ${areaInSelectedUnit.toFixed(4)}`;
+                    parameters = { base: parBase, height: parHeight };
+                } 
+                else if (parSideA && parSideB && parAngle && parSideA > 0 && parSideB > 0 && parAngle > 0 && parAngle < 180) {
+                    // Расчет через стороны и угол
+                    // Конвертируем градусы в радианы для Math.sin
+                    const angleInRadians = parAngle * Math.PI / 180;
+                    areaInSelectedUnit = parSideA * parSideB * Math.sin(angleInRadians);
+                    formula = 'S = a × b × sin(α)';
+                    steps = `S = ${parSideA} × ${parSideB} × sin(${parAngle}°) = ${areaInSelectedUnit.toFixed(4)}`;
+                    parameters = { sideA: parSideA, sideB: parSideB, angle: parAngle };
+                }
+                else {
+                    throw new Error('Заполните поля для одного из способов расчета');
+                }
+                break;
         }
         
         // Форматируем результат с правильным количеством знаков
@@ -257,7 +509,7 @@ function formatAreaValue(value) {
     }
 }
 
-// Конвертация площади (ИСПРАВЛЕННАЯ ВЕРСИЯ)
+// Конвертация площади
 function convertArea(value, fromUnit, toUnit) {
     // Сначала конвертируем в квадратные метры
     const valueInSquareMeters = value * unitConversionRates[fromUnit];
@@ -277,7 +529,7 @@ function showResult(area, unit, formula, steps) {
     // Анимированное отображение результата
     resultElement.innerHTML = `
         <div class="result-animation">
-            <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+            <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px; color: #4CAF50;"></i>
             <div class="result-value" style="font-size: 2.5rem; font-weight: bold;">${area} ${unit}</div>
             <div class="result-unit" style="font-size: 1rem; opacity: 0.9;">${unitDisplayNames[unit] || unit}</div>
         </div>
@@ -302,9 +554,21 @@ function getCurrentParameters() {
 
 // Сохранение в историю
 function saveToHistory(area, unit, formula, parameters = {}) {
+    const shapeNames = {
+        'square': 'Квадрат',
+        'rectangle': 'Прямоугольник',
+        'triangle': 'Треугольник',
+        'circle': 'Круг',
+        'trapezoid': 'Трапеция',
+        'ellipse': 'Эллипс',
+        'rhombus': 'Ромб',
+        'parallelogram': 'Параллелограмм'
+    };
+    
     const historyItem = {
         id: Date.now(),
         shape: currentShape,
+        shapeName: shapeNames[currentShape] || currentShape,
         area: area.toString(),
         unit: unit,
         formula: formula,
@@ -348,8 +612,22 @@ function updateHistoryTable() {
     calculationHistory.forEach(item => {
         const row = document.createElement('tr');
         
+        // Добавляем иконку в зависимости от фигуры
+        let shapeIcon = '';
+        switch(item.shape) {
+            case 'square': shapeIcon = 'fa-square'; break;
+            case 'rectangle': shapeIcon = 'fa-rectangle-landscape'; break;
+            case 'triangle': shapeIcon = 'fa-play'; break;
+            case 'circle': shapeIcon = 'fa-circle'; break;
+            case 'trapezoid': shapeIcon = 'fa-shapes'; break;
+            case 'ellipse': shapeIcon = 'fa-egg'; break;
+            case 'rhombus': shapeIcon = 'fa-gem'; break;
+            case 'parallelogram': shapeIcon = 'fa-sliders-h'; break;
+            default: shapeIcon = 'fa-shape';
+        }
+        
         row.innerHTML = `
-            <td>${getShapeName(item.shape)}</td>
+            <td><i class="fas ${shapeIcon}" style="margin-right: 8px;"></i> ${item.shapeName || getShapeName(item.shape)}</td>
             <td>${item.parameters || '-'}</td>
             <td><strong>${item.area}</strong> ${unitDisplayNames[item.unit] || item.unit}</td>
             <td>${item.date}</td>
@@ -380,7 +658,9 @@ function getShapeName(shapeType) {
         'triangle': 'Треугольник',
         'circle': 'Круг',
         'trapezoid': 'Трапеция',
-        'ellipse': 'Эллипс'
+        'ellipse': 'Эллипс',
+        'rhombus': 'Ромб',
+        'parallelogram': 'Параллелограмм'
     };
     return names[shapeType] || shapeType;
 }
@@ -418,7 +698,7 @@ window.useHistoryItem = function(id) {
     }
 };
 
-// Конвертер единиц (ИСПРАВЛЕННАЯ ВЕРСИЯ)
+// Конвертер единиц
 function setupUnitConverter() {
     // const convertBtn = document.getElementById('convert-btn');
     const converterValue = document.getElementById('converter-value');
@@ -428,6 +708,7 @@ function setupUnitConverter() {
     
     if ( !converterValue || !converterFrom || !converterTo || !converterResult) {
         console.error('Элементы конвертера не найдены');
+        return;
     }
     
     // Функция конвертации
@@ -464,13 +745,10 @@ function setupUnitConverter() {
         
         converterResult.textContent = formattedResult;
         converterResult.style.color = 'var(--text-color)';
-        
-        // Показываем детали конвертации в консоли (для отладки)
-        console.log(`Конвертация: ${value} ${fromUnit} = ${result} ${toUnit}`);
     }
     
-    // Обработчик кнопки
-    // convertBtn.addEventListener('click', performConversion);
+    //  convertBtn.addEventListener('click', performConversion); Обработчик кнопки
+  
     
     // Автоматическая конвертация при изменении полей
     converterValue.addEventListener('input', performConversion);
@@ -586,81 +864,124 @@ function setupEventListeners() {
     });
 }
 
-// Добавляем небольшие CSS-стили для улучшения интерфейса
-const style = document.createElement('style');
-style.textContent = `
-    .input-group {
-        margin-bottom: 20px;
-        animation: slideIn 0.3s ease;
-    }
-    
-    .input-group small {
-        display: block;
-        color: #888;
-        margin-top: 5px;
-        font-size: 0.85rem;
-    }
-    
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
+// Инициализация подсказок
+function initializeTooltips() {
+    // Добавляем подсказки для полей ввода
+    const style = document.createElement('style');
+    style.textContent = `
+        .input-group {
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease;
+            position: relative;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        
+        .input-group small {
+            display: block;
+            color: #888;
+            margin-top: 5px;
+            font-size: 0.85rem;
         }
-    }
-    
-    .history-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 5px 10px;
-        margin: 0 2px;
-        border-radius: 5px;
-        transition: all 0.3s;
-        color: var(--text-color);
-    }
-    
-    .history-btn:hover {
-        background: var(--primary-color);
-        color: white;
-    }
-    
-    .result-animation {
-        animation: pulse 1s ease;
-    }
-    
-    @keyframes pulse {
-        0% {
-            transform: scale(0.95);
-            opacity: 0;
+        
+        .input-divider {
+            text-align: center;
+            margin: 15px 0;
+            color: var(--primary-color);
+            font-weight: bold;
+            position: relative;
         }
-        50% {
-            transform: scale(1.05);
+        
+        .input-divider::before,
+        .input-divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: #ddd;
         }
-        100% {
-            transform: scale(1);
-            opacity: 1;
+        
+        .input-divider::before {
+            left: 0;
         }
-    }
+        
+        .input-divider::after {
+            right: 0;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .history-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin: 0 2px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            color: var(--text-color);
+        }
+        
+        .history-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .result-animation {
+            animation: pulse 0.5s ease;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .calculate-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .converter-container {
+            transition: all 0.3s ease;
+        }
+        
+        .converter-container:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        /* Стили для новых фигур */
+        [data-shape="rhombus"] i,
+        [data-shape="parallelogram"] i {
+            transition: transform 0.3s;
+        }
+        
+        [data-shape="rhombus"]:hover i,
+        [data-shape="parallelogram"]:hover i {
+            transform: rotate(15deg);
+        }
+    `;
     
-    .calculate-btn:active {
-        transform: scale(0.98);
-    }
-    
-    .converter-container {
-        transition: all 0.3s ease;
-    }
-    
-    .converter-container:hover {
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    }
-`;
-
-document.head.appendChild(style);
+    document.head.appendChild(style);
+}
 
 // Выводим информацию о загрузке
-console.log('Калькулятор площадей готов к работе!');
-console.log('Доступные единицы измерения:', Object.keys(unitConversionRates));
+console.log('✅ Калькулятор площадей готов к работе!');
+console.log('📐 Доступные фигуры: Квадрат, Прямоугольник, Треугольник, Круг, Трапеция, Эллипс, Ромб, Параллелограмм');
+console.log('📏 Доступные единицы измерения:', Object.keys(unitConversionRates));

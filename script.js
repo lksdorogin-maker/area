@@ -579,8 +579,8 @@ function saveToHistory(area, unit, formula, parameters = {}) {
     calculationHistory.unshift(historyItem);
     
     // Ограничиваем историю 50 записями
-    if (calculationHistory.length > 50) {
-        calculationHistory = calculationHistory.slice(0, 50);
+    if (calculationHistory.length > 5) {
+        calculationHistory = calculationHistory.slice(0, 5);
     }
     
     // Сохраняем в localStorage
